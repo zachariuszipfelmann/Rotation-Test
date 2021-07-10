@@ -23,7 +23,7 @@ class Collidor
       new_points[index] = (point - @rotate_point).rotate(degrees) + @rotate_point
     end
 
-    return new_points
+    return Collidor.new(new_points, @rotate_point)
   end
 
   def rotate!(degrees)
