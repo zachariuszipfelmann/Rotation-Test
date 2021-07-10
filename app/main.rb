@@ -22,10 +22,9 @@ class Game
     
     COLLIDOR_COLOR_INTERSECT ||= {r: 255, g: 119, b: 119}
     
-    COLLIDORS ||= [Collidor.new([[670, 460], [800, 480], [940, 540], [870, 660], [710, 570]])]
+    state.collidor ||= Collidor.new([[670, 460], [800, 480], [940, 540], [870, 660], [710, 570]])
 
-    state.collidor_colors ||= Array.new(size = COLLIDORS.length, default = COLLIDOR_COLOR_NORMAL)
-    
+    state.collidor_color ||= COLLIDOR_COLOR_NORMAL
   end
 
 
@@ -38,33 +37,32 @@ class Game
 
     outputs.background_color = BACKGROUND_COLOR.values
 
-    COLLIDORS.each_with_index do |collidor, index|
-      collidor.points.each_cons(2) do |points|
+    state.collidor.points.each_cons(2) do |points|
 
-        line = {x: points[0][0],
-          y: points[0][1],
-          x2: points[1][0],
-          y2: points[1][1]
-        }.merge(state.collidor_colors[index])
+      line = {x: points[0][0],
+        y: points[0][1],
+        x2: points[1][0],
+        y2: points[1][1]
+      }.merge(state.collidor_color)
 
-        outputs.static_lines << line
-
-      end
-
-      line = {x: collidor.points.first[0],
-        y: collidor.points.first[1],
-        x2: collidor.points.last[0],
-        y2: collidor.points.last[1]
-      }.merge(state.collidor_colors[index])
-
-      outputs.static_lines << line
+      outputs.lines << line
 
     end
-  
+
+    line = {x: state.collidor.points.first[0],
+      y: state.collidor.points.first[1],
+      x2: state.collidor.points.last[0],
+      y2: state.collidor.points.last[1]
+    }.merge(state.collidor_color)
+
+    outputs.lines << line
+
   end
 
   def input
-
+    state.collidor.move!(Vec2D.new([args.inputs.left_right, args.inputs.up_down]) * 2)
+    state.collidor.rotate!(1) if args.inputs.keyboard.e
+    state.collidor.rotate!(-1) if args.inputs.keyboard.q
   end
 
 end

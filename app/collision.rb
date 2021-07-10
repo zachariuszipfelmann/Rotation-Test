@@ -1,20 +1,57 @@
 class Collidor
 
-  attr_accessor :points
+  attr_accessor :points, :rotate_point
     
-  def initialize(points)
+  def initialize(points, rotate_point = nil)
     @points = []
+
+    if rotate_point
+      @rotate_point = Vec2D.new(rotate_point)
+    else
+      @rotate_point = Vec2D.new(points[0])
+    end
 
     points.each_with_index do |point, index|
       @points[index] = Vec2D.new(point)
     end
+
   end
 
   def rotate(degrees)
-    new_points[0] = @points[0]
+    new_points = @points
     @points.each_with_index do |point, index|
-      new_points[index] = point
+      new_points[index] = (point - @rotate_point).rotate(degrees) + @rotate_point
     end
+
+    return new_points
+  end
+
+  def rotate!(degrees)
+    new_points = @points
+    @points.each_with_index do |point, index|
+      new_points[index] = (point - @rotate_point).rotate(degrees) + @rotate_point
+    end
+
+    @points = new_points
+  end
+
+
+  def move(direction)
+    new_points = @points.map do |point|
+      point += direction
+    end
+
+    new_rotate_point += direction
+
+    return Collidor.new(new_points, new_rotate_point)
+  end
+  
+  def move!(direction)
+    @points = @points.map do |point|
+      point += direction
+    end
+
+    @rotate_point += direction
   end
   
   def intersects(other_collidor)
@@ -79,7 +116,7 @@ class Line
     
   def intersects(other_line)
 
-    # stolen fast line segment intersection
+    # fast line segment intersection
 
     A = @b - @a
     B = other_line.a - other_line.b
