@@ -1,4 +1,4 @@
-class Collidor
+class Collider
 
   attr_accessor :points, :rotate_point
     
@@ -19,7 +19,7 @@ class Collidor
 
 
   def rotate(degrees)
-    Collidor.new(@points.map {|point| (point - @rotate_point).rotate(degrees) + @rotate_point}, @rotate_point)
+    Collider.new(@points.map {|point| (point - @rotate_point).rotate(degrees) + @rotate_point}, @rotate_point)
   end
   
 
@@ -29,7 +29,7 @@ class Collidor
 
 
   def move(direction)
-    Collidor.new(@points.map {|point| point += direction}, @rotate_point + direction)
+    Collider.new(@points.map {|point| point += direction}, @rotate_point + direction)
   end
   
 
@@ -39,7 +39,7 @@ class Collidor
   end
   
 
-  def intersects(other_collidor)
+  def intersects(other_collider)
     temp0 = @points.map(&:x).min
     temp1 = @points.map(&:y).min
 
@@ -49,13 +49,13 @@ class Collidor
       h: @points.map(&:y).max - temp1
     }
 
-    temp0 = other_collidor.points.map(&:x).min
-    temp1 = other_collidor.points.map(&:y).min
+    temp0 = other_collider.points.map(&:x).min
+    temp1 = other_collider.points.map(&:y).min
 
     other_aabb = {x: temp0,
       y: temp1,
-      w: other_collidor.points.map(&:x).max - temp0,
-      h: other_collidor.points.map(&:y).max - temp1
+      w: other_collider.points.map(&:x).max - temp0,
+      h: other_collider.points.map(&:y).max - temp1
     }
 
     unless(self_aabb.x < other_aabb.x + other_aabb.w &&
@@ -68,7 +68,7 @@ class Collidor
     @points.each_cons(2) do |self_data|
       self_line = Line.new(*self_data)
 
-      other_collidor.points.each_cons(2) do |other_data|
+      other_collider.points.each_cons(2) do |other_data|
         other_line = Line.new(*other_data)
 
         if self_line.intersects(other_line)
@@ -83,7 +83,7 @@ end
 
 
 class Line
-  
+
   attr_accessor :a, :b
 
 
