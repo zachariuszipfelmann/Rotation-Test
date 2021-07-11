@@ -39,42 +39,35 @@ class Collider
   end
   
 
-  def intersects(other_collider)
-    temp0 = @points.map(&:x).min
-    temp1 = @points.map(&:y).min
-
-    self_aabb = {x: temp0,
-      y: temp1,
-      w: @points.map(&:x).max - temp0,
-      h: @points.map(&:y).max - temp1
-    }
-
-    temp0 = other_collider.points.map(&:x).min
-    temp1 = other_collider.points.map(&:y).min
-
-    other_aabb = {x: temp0,
-      y: temp1,
-      w: other_collider.points.map(&:x).max - temp0,
-      h: other_collider.points.map(&:y).max - temp1
-    }
-
-    unless(self_aabb.x < other_aabb.x + other_aabb.w &&
-      self_aabb.x + self_aabb.w > other_aabb.x &&
-      self_aabb.y < other_aabb.y + other_aabb.h &&
-      self_aabb.y + self_aabb.h > other_aabb.y)
-      return false
-    end
-
+  def intersects(other_collidor)   
     @points.each_cons(2) do |self_data|
       self_line = Line.new(*self_data)
 
-      other_collider.points.each_cons(2) do |other_data|
+      other_collidor.points.each_cons(2) do |other_data|
         other_line = Line.new(*other_data)
 
         if self_line.intersects(other_line)
           return true
         end
       end
+
+      if self_line.intersects(Line.new(other_collidor.points.last, other_collidor.points.first))
+        return true
+      end
+    end
+
+    self_line = Line.new(@points.last, @points.first)
+
+    other_collidor.points.each_cons(2) do |other_data|
+      other_line = Line.new(*other_data)
+
+      if self_line.intersects(other_line)
+        return true
+      end
+    end
+
+    if self_line.intersects(Line.new(other_collidor.points.last, other_collidor.points.first))
+      return true
     end
 
     return false
