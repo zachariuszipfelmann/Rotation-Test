@@ -1,5 +1,5 @@
 # Rotation-Test
-A small demo to test the rotation method of my Collidor class.
+A small demo to test the rotation method of my Collider class.
 
 ### Controlls:
 
@@ -14,3 +14,5 @@ A small demo to test the rotation method of my Collidor class.
   Q -> Rotates by 1°/tick
   
   E -> Rotates by -1°/tick
+
+  Tab -> Changes the point, the polygon is rotated by
