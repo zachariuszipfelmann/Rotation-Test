@@ -18,43 +18,24 @@ class Collidor
   end
 
   def rotate(degrees)
-    new_points = @points
-    @points.each_with_index do |point, index|
-      new_points[index] = (point - @rotate_point).rotate(degrees) + @rotate_point
-    end
-
-    return Collidor.new(new_points, @rotate_point)
+    Collidor.new(@points.map {|point| (point - @rotate_point).rotate(degrees) + @rotate_point}, @rotate_point)
   end
-
+  
   def rotate!(degrees)
-    new_points = @points
-    @points.each_with_index do |point, index|
-      new_points[index] = (point - @rotate_point).rotate(degrees) + @rotate_point
-    end
-
-    @points = new_points
+    @points.map! {|point| (point - @rotate_point).rotate(degrees) + @rotate_point}
   end
 
 
   def move(direction)
-    new_points = @points.map do |point|
-      point += direction
-    end
-
-    new_rotate_point += direction
-
-    return Collidor.new(new_points, new_rotate_point)
+    Collidor.new(@points.map {|point| point += direction}, @rotate_point + direction)
   end
   
   def move!(direction)
-    @points = @points.map do |point|
-      point += direction
-    end
-
+    @points.map! {|point| point += direction}
     @rotate_point += direction
   end
   
-  def intersects(other_collidor)
+  def collides(other_collidor)
 
     # convex polygon collision
 
@@ -102,6 +83,44 @@ class Collidor
     return false
   end
 
+  def intersects(other_collidor)
+
+    # convex polygon collision
+        
+    @points.each_cons(2) do |self_data|
+      self_line = Line.new(*self_data)
+
+      other_collidor.points.each_cons(2) do |other_data|
+        other_line = Line.new(*other_data)
+
+        if self_line.intersects(other_line)
+          return true
+        end
+
+      end
+
+      if self_line.intersects(Line.new(other_collidor.points.last, other_collidor.points.first))
+        return true
+      end
+
+    end
+
+    self_line = Line.new(@points.last, @points.first)
+
+    other_collidor.points.each_cons(2) do |other_data|
+      other_line = Line.new(*other_data)
+
+      if self_line.intersects(other_line)
+        return true
+      end
+    end
+
+    if self_line.intersects(Line.new(other_collidor.points.last, other_collidor.points.first))
+      return true
+    end
+
+    return false
+  end
 end
 
 
@@ -112,6 +131,18 @@ class Line
   def initialize(a, b)
     @a = a
     @b = b
+  end
+
+  def to_s
+    return "[" + @a.to_s + ", " + @b.to_s + "]"
+  end
+
+  def to_h
+    return {x: a.x, y: a.y, x2: b.x, y2: b.y}
+  end
+ 
+  def as_hash
+    self.to_h
   end
     
   def intersects(other_line)

@@ -10,7 +10,6 @@ class Game
   def tick
     defaults
     input
-    calc
     render
   end 
 
@@ -20,18 +19,11 @@ class Game
     
     COLLIDOR_COLOR_NORMAL ||= {r: 255, g: 206, b: 150}
     
-    COLLIDOR_COLOR_INTERSECT ||= {r: 255, g: 119, b: 119}
+    ROTATE_POINT_COLOR ||= {r: 255, g: 119, b: 119}
     
     state.collidor ||= Collidor.new([[670, 460], [800, 480], [940, 540], [870, 660], [710, 570]])
-
-    state.collidor_color ||= COLLIDOR_COLOR_NORMAL
   end
 
-
-  def calc
-    
-  end
-  
 
   def render
 
@@ -39,30 +31,41 @@ class Game
 
     state.collidor.points.each_cons(2) do |points|
 
-      line = {x: points[0][0],
+      outputs.lines << {x: points[0][0],
         y: points[0][1],
         x2: points[1][0],
         y2: points[1][1]
-      }.merge(state.collidor_color)
-
-      outputs.lines << line
+      }.merge(COLLIDOR_COLOR_NORMAL)
 
     end
 
-    line = {x: state.collidor.points.first[0],
+    outputs.lines << {x: state.collidor.points.first[0],
       y: state.collidor.points.first[1],
       x2: state.collidor.points.last[0],
       y2: state.collidor.points.last[1]
-    }.merge(state.collidor_color)
+    }.merge(COLLIDOR_COLOR_NORMAL)
 
-    outputs.lines << line
+    outputs.solids << {x: state.collidor.rotate_point.x - 5,
+      y: state.collidor.rotate_point.y - 5,
+      w: 10,
+      h: 10
+    }.merge(ROTATE_POINT_COLOR)
 
   end
 
+
   def input
-    state.collidor.move!(Vec2D.new([args.inputs.left_right, args.inputs.up_down]) * 2)
-    state.collidor.rotate!(1) if args.inputs.keyboard.e
-    state.collidor.rotate!(-1) if args.inputs.keyboard.q
+    unless state.collidor.move(Vec2D.new([args.inputs.left_right, args.inputs.up_down]) * 4).intersects(Collidor.new([[0, 0], [1280, 0], [1280, 720], [0, 720]]))
+      state.collidor.move!(Vec2D.new([args.inputs.left_right, args.inputs.up_down]) * 4)
+    end
+
+    if args.inputs.keyboard.e and not state.collidor.rotate(2).intersects(Collidor.new([[0, 0], [1280, 0], [1280, 720], [0, 720]]))
+      state.collidor.rotate!(2)
+    end
+
+    if args.inputs.keyboard.q and not state.collidor.rotate(-2).intersects(Collidor.new([[0, 0], [1280, 0], [1280, 720], [0, 720]]))
+      state.collidor.rotate!(-2)
+    end
   end
 
 end
