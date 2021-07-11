@@ -2,6 +2,7 @@ class Collidor
 
   attr_accessor :points, :rotate_point
     
+
   def initialize(points, rotate_point = nil)
     @points = []
 
@@ -14,13 +15,14 @@ class Collidor
     points.each_with_index do |point, index|
       @points[index] = Vec2D.new(point)
     end
-
   end
+
 
   def rotate(degrees)
     Collidor.new(@points.map {|point| (point - @rotate_point).rotate(degrees) + @rotate_point}, @rotate_point)
   end
   
+
   def rotate!(degrees)
     @points.map! {|point| (point - @rotate_point).rotate(degrees) + @rotate_point}
   end
@@ -30,17 +32,14 @@ class Collidor
     Collidor.new(@points.map {|point| point += direction}, @rotate_point + direction)
   end
   
+
   def move!(direction)
     @points.map! {|point| point += direction}
     @rotate_point += direction
   end
   
-  def collides(other_collidor)
 
-    # convex polygon collision
-
-    # bounding box AABB
-
+  def intersects(other_collidor)
     temp0 = @points.map(&:x).min
     temp1 = @points.map(&:y).min
 
@@ -66,7 +65,6 @@ class Collidor
       return false
     end
 
-        
     @points.each_cons(2) do |self_data|
       self_line = Line.new(*self_data)
 
@@ -76,47 +74,7 @@ class Collidor
         if self_line.intersects(other_line)
           return true
         end
-
       end
-    end
-
-    return false
-  end
-
-  def intersects(other_collidor)
-
-    # convex polygon collision
-        
-    @points.each_cons(2) do |self_data|
-      self_line = Line.new(*self_data)
-
-      other_collidor.points.each_cons(2) do |other_data|
-        other_line = Line.new(*other_data)
-
-        if self_line.intersects(other_line)
-          return true
-        end
-
-      end
-
-      if self_line.intersects(Line.new(other_collidor.points.last, other_collidor.points.first))
-        return true
-      end
-
-    end
-
-    self_line = Line.new(@points.last, @points.first)
-
-    other_collidor.points.each_cons(2) do |other_data|
-      other_line = Line.new(*other_data)
-
-      if self_line.intersects(other_line)
-        return true
-      end
-    end
-
-    if self_line.intersects(Line.new(other_collidor.points.last, other_collidor.points.first))
-      return true
     end
 
     return false
@@ -125,28 +83,32 @@ end
 
 
 class Line
-
+  
   attr_accessor :a, :b
+
 
   def initialize(a, b)
     @a = a
     @b = b
   end
 
+
   def to_s
     return "[" + @a.to_s + ", " + @b.to_s + "]"
   end
+
 
   def to_h
     return {x: a.x, y: a.y, x2: b.x, y2: b.y}
   end
  
+
   def as_hash
     self.to_h
   end
     
-  def intersects(other_line)
 
+  def intersects(other_line)
     # fast line segment intersection
 
     A = @b - @a
@@ -166,5 +128,4 @@ class Line
 
     return value1 and value2
   end
-
 end

@@ -2,6 +2,7 @@ class Vec2D
 
   attr_accessor :x, :y
 
+
   def initialize(x, y = nil)
     if y
       @x = x
@@ -12,6 +13,7 @@ class Vec2D
     end
   end
 
+
   def [](i)
     return @x if i == 0
     return @y if i == 1
@@ -19,33 +21,41 @@ class Vec2D
     raise ArgumentError, "Can only index Vec2D with 0 or 1"
   end
 
+
   def +(other_vector)
     return Vec2D.new(x + other_vector.x, y + other_vector.y)
   end
+
 
   def -(other_vector)
     return Vec2D.new(x - other_vector.x, y - other_vector.y)
   end
 
+
   def *(other)
     return Vec2D.new(x * other, y * other)
   end
+
 
   def to_s
     return "[" + @x.to_s + ", " + @y.to_s + "]"
   end
 
+
   def to_h
     return {x: @x, y: @y}
   end
  
+
   def as_hash
     self.to_h
   end
 
+
   def length
     return Math.hypot(@x, @y)
   end
+
 
   def angle 
     degrees = -(Math.atan2(@y, @x) * 57.2957795)
@@ -53,10 +63,12 @@ class Vec2D
     return degrees + 360
   end
 
+
   def normalize
     return Vec2D.new(0, 0) if [@x, @y] == [0, 0]     
     return Vec2D.new(@x/self.length, @y/self.length)
   end
+
 
   def normalize!
     unless [@x, @y] == [0, 0]
@@ -67,6 +79,7 @@ class Vec2D
     return self 
   end
 
+
   def rotate(degrees)
     degrees = -degrees/57.2957795
 
@@ -75,6 +88,7 @@ class Vec2D
 
     return Vec2D.new(x, y)
   end
+
 
   def rotate!(degrees)
     degrees = -degrees/57.2957795
@@ -88,6 +102,7 @@ class Vec2D
     return self
   end
 
+
   def with_rotation(degrees)
     degrees = -degrees/57.2957795
 
@@ -97,6 +112,7 @@ class Vec2D
     return Vec2D.new(x, y)
   end
 
+  
   def rotation=(degrees)
     degrees = -degrees/57.2957795
 
